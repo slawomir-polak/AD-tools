@@ -1,0 +1,25 @@
+# funkcja suspendująca proces
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+public static class PsTools {
+    [DllImport("ntdll.dll", SetLastError = true)]
+    public static extern int NtSuspendProcess(IntPtr processHandle);
+}
+"@
+
+function Suspend-Process {
+    param([int]$Id)
+
+    $proc = Get-Process -Id $Id -ErrorAction Stop
+    $handle = $proc.Handle
+    [PsTools]::NtSuspendProcess($handle)
+}
+
+
+
+
+# np. wstrzymanie notatnika
+$p = Get-Process notepad
+Suspend-Process -Id $p.Id
